@@ -97,3 +97,4 @@ $comment->thread = $thread;
 $orm->contents->persist($comment);
 
 $orm->flush();
+$orm->clearIdentityMapAndCaches($orm::I_KNOW_WHAT_I_AM_DOING);
