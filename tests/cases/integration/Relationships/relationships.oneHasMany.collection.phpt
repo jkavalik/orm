@@ -19,21 +19,14 @@ class RelationshipOneHasManyCollectionTest extends DataTestCase
 {
 	public function testRemoveA()
 	{
-		$authorA = $this->orm->authors->getById(1);
-		$authorB = $this->orm->authors->getById(2);
-		$books = $authorA->books;
-
-		$queries = $this->getQueries(function () use ($authorA, $authorB, $books) {
-			Assert::count(0, $books->getEntitiesForPersistence());
-			Assert::count(2, iterator_to_array($books));
-			Assert::count(2, $books->getEntitiesForPersistence());
-
+		$queries = $this->getQueries(function () {
+			$authorA = $this->orm->authors->getById(1);
 			$bookA = $this->orm->books->getById(1);
 			Assert::same($authorA, $bookA->author); // THIS FIRES UNNECESSARY QUERY: SELECT * FROM authors WHERE id IN (1)
 		});
 
 		if ($queries) {
-			Assert::count(1, $queries); // SELECT all books
+			Assert::count(2, $queries); // SELECT authorA, SELECT booksA
 		}
 	}
 }
