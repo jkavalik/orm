@@ -4,6 +4,7 @@ namespace NextrasTests\Orm;
 
 use Mockery;
 use Nette\DI\Container;
+use Nextras\Dbal\Connection;
 use Nextras\Orm\Model\IModel;
 use Nextras\Orm\TestHelper\TestCaseEntityTrait;
 use Tester;
@@ -50,4 +51,30 @@ class TestCase extends Tester\TestCase
 		Mockery::close();
 	}
 
+
+	protected function getQueries(callable $callback)
+	{
+		$conn = $this->container->getByType(Connection::class, false);
+
+		if (!$conn) {
+			$callback();
+			return [];
+		}
+
+		$queries = [];
+		$conn->onQuery[__CLASS__] = function ($conn, $sql) use (& $queries) {
+			if (!preg_match('#pg_catalog|information_schema|SHOW FULL#', $sql)) {
+				$queries[] = $sql;
+				echo $sql, "\n";
+			}
+		};
+
+		try {
+			$callback();
+			return $queries;
+
+		} finally {
+			unset($conn->onQuery[__CLASS__]);
+		}
+	}
 }
