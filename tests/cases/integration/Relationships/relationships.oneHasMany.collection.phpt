@@ -29,6 +29,7 @@ class RelationshipOneHasManyCollectionTest extends DataTestCase
 			Assert::count(2, $books->getEntitiesForPersistence());
 
 			$bookA = $this->orm->books->getById(1);
+			Assert::same($authorA, $bookA->author); // THIS FIRES UNNECESSARY QUERY: SELECT * FROM authors WHERE id IN (1)
 		});
 
 		if ($queries) {
