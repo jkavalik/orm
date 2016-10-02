@@ -36,6 +36,9 @@ abstract class HasMany extends Object implements IRelationshipCollection
 	/** @var IEntity[] */
 	protected $toRemove = [];
 
+	/** @var IEntity[] */
+	protected $referenced = [];
+
 	/** @var IRepository */
 	protected $targetRepository;
 
@@ -44,9 +47,6 @@ abstract class HasMany extends Object implements IRelationshipCollection
 
 	/** @var bool */
 	protected $isModified = false;
-
-	/** @var bool */
-	protected $wasLoaded = false;
 
 	/** @var IRelationshipMapper */
 	protected $relationshipMapper;
@@ -113,6 +113,7 @@ abstract class HasMany extends Object implements IRelationshipCollection
 		if (isset($this->toAdd[$entityHash])) {
 			unset($this->toAdd[$entityHash]);
 		} else {
+			unset($this->referenced[$entityHash]);
 			$this->toRemove[$entityHash] = $entity;
 		}
 
@@ -207,7 +208,7 @@ abstract class HasMany extends Object implements IRelationshipCollection
 
 	public function isLoaded()
 	{
-		return $this->wasLoaded || $this->collection !== null || !empty($this->toAdd) || !empty($this->toRemove);
+		return !empty($this->referenced) || $this->collection !== null || !empty($this->toAdd) || !empty($this->toRemove);
 	}
 
 

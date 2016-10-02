@@ -16,12 +16,16 @@ class ManyHasMany extends HasMany
 	public function getEntitiesForPersistence()
 	{
 		$entities = [];
-		foreach ($this->toAdd as $entity) {
-			$entities[] = $entity;
+		foreach ($this->toAdd as $addHash => $add) {
+			$entities[$addHash] = $add;
 		}
-		if ($this->collection || $this->wasLoaded) {
-			foreach ($this->getIterator() as $entity) {
-				$entities[] = $entity;
+		if ($this->collection !== null) {
+			foreach ($this->collection as $entity) {
+				$entities[spl_object_hash($entity)] = $entity;
+			}
+		} else {
+			foreach ($this->referenced as $referenceHash => $reference) {
+				$entities[$referenceHash] = $reference;
 			}
 		}
 		return $entities;
@@ -30,6 +34,8 @@ class ManyHasMany extends HasMany
 
 	public function doPersist()
 	{
+		$this->referenced = $this->getEntitiesForPersistence();
+
 		$toRemove = [];
 		foreach ($this->toRemove as $entity) {
 			$id = $entity->getValue('id');
@@ -44,7 +50,6 @@ class ManyHasMany extends HasMany
 		$this->toAdd = [];
 		$this->toRemove = [];
 		$this->isModified = false;
-		$this->wasLoaded = true;
 		$this->collection = null;
 
 		if ($this->metadata->relationship->isMain) {
