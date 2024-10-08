@@ -140,6 +140,15 @@ CREATE TABLE user_stats
     CONSTRAINT user_stats_user_id FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+CREATE TABLE user_stats_x
+(
+    user_id int            NOT NULL,
+    date    date           NOT NULL,
+    value   int            NOT NULL,
+    PRIMARY KEY (user_id, date),
+    CONSTRAINT user_stats_x_user_id FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE NO ACTION ON UPDATE CASCADE
+);
+
 
 CREATE TABLE users_x_users
 (
@@ -165,3 +174,21 @@ CREATE TABLE logs
     count int            NOT NULL,
     PRIMARY KEY (date)
 );
+
+CREATE TABLE publishers_x_tags
+(
+    publisher_id int NOT NULL,
+    tag_id  int NOT NULL,
+    PRIMARY KEY (publisher_id, tag_id),
+    CONSTRAINT publishers_x_tags_tag FOREIGN KEY (tag_id) REFERENCES tags (id),
+    CONSTRAINT publishers_x_tags_publisher FOREIGN KEY (publisher_id) REFERENCES publishers (publisher_id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE time_series
+(
+    date  datetimeoffset NOT NULL,
+    value int            NOT NULL,
+    PRIMARY KEY (date)
+);
+
