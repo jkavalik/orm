@@ -9,6 +9,7 @@ namespace NextrasTests\Orm\Integration\Entity;
 
 
 use DateTimeImmutable;
+use DateTimeZone;
 use Nette\Utils\DateTime;
 use Nextras\Dbal\IConnection;
 use Nextras\Orm\Exception\InvalidArgumentException;
@@ -69,13 +70,13 @@ class EntityCompositePKTest extends DataTestCase
 
 		$stat = new UserStatX();
 		$stat->user = $user;
-		$stat->date = '2019-01-01';
+		$stat->date = new DateTime('2019-01-01', new DatetimeZone('UTC'));
 		$stat->value = 100;
 		$this->orm->persistAndFlush($stat);
 
 		$this->orm->clear();
 
-		$res = $this->orm->userStatsX->getByChecked(['date' => new DateTime('2019-01-01')]);
+		$res = $this->orm->userStatsX->getByChecked(['date' => new DateTime('2019-01-01', new DatetimeZone('UTC'))]);
 		Assert::same(100, $res->value);
 
 		$res->value = 200;
@@ -84,7 +85,7 @@ class EntityCompositePKTest extends DataTestCase
 
 		$this->orm->clear();
 
-		$res = $this->orm->userStatsX->getByChecked(['date' => new DateTime('2019-01-01')]);
+		$res = $this->orm->userStatsX->getByChecked(['date' => new DateTime('2019-01-01', new DatetimeZone('UTC'))]);
 		Assert::same(200, $res->value);
 
 		Environment::$checkAssertions = false;
